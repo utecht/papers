@@ -1,0 +1,1 @@
+texi2pdf triplestores.tex; open triplestores.pdf

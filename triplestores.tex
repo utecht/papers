@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage[sorting=none]{biblatex}
+\usepackage{url}
+\title{RDF Triple Stores for Client-side Applications}
+\author{Joseph Utecht}
+\date{July 2015}
+\begin{document}
+\maketitle
+\section{Introduction}
+
+Client driven web applications are becoming increasingly popular \cite{Fielding2000}.  At the same time REpresentation State Transfer (REST) protocals for datasets have become more standardized, allowing for Javascript frameworks to implement standardized create, read, update and delete (CRUD) functions.  This presents some interesting problems when working with current RDF triple stores \cite{Battle2008}.
+
+\section{Material and Methods}
+\subsection{RDF Triple Stores}
+
+We have decided to focus on Apache Jena \cite{Jena}, Blazegraph \cite{Blazegraph}, and Sesame \cite{Sesame} RDF stores for our testing due to their support for RDFS reasoning, open source licenses, ability to handle large datasets and REST endpoints for interaction. \cite{Voigt2012}
+
+Testing was performed on VirtualBox VM \cite{Virtualbox} with 2x 2.4 GHz 6-core Xeon processors and 8GB of ram.  The operating system was CentOS 7 \cite{Centos} and all of the stores were run through the Java application server Tomcat \cite{Tomcat}.
+
+Apache Jena uses a Java based front-end called Fuseki these are distributed under the Apache License 2.0.  Fuseki can either be run standalone or under a Java application server.  For the testing the most recent version Fuseki 2.0.0 under Tomcat was used with RDFS level reasoning.
+
+Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the GPLv2 or a commercial license.  It can also either be run as a standalone or in a Java application server.  Blazegraph 1.5.1 under Tomcat was used for testing with a triple + inference graph.
+
+Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native triple store with RDFS inference.
+
+\subsection{Testing Method}
+
+\section{Results}
+
+\section{Discussion}
+
+\bibliography{mybib}
+\bibliographystyle{plain}
+\end{document}
