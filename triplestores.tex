@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[sorting=none]{biblatex}
+\usepackage{cite}
 \usepackage{url}
 \title{RDF Triple Stores for Client-side Applications}
 \author{Joseph Utecht}
@@ -24,6 +24,15 @@ Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the
 Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native triple store with RDFS inference.
 
 \subsection{Testing Method}
+We used a modified version of the Lehigh University Benchmark (LUBM) \cite{Guo2005} to test performance and capability of the triple stores.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models, however this benchmark gave us an arbitrarily large set of data with RDFS classes that we could use for load testing.  We also modified the ontology provided to allow for RDFS inference in cases where OWL reasoning was required.
+
+To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores we were testing.  This framework measured three areas, data loading time, large query runtime, and rate small queries could be returned in parallel as queries per second.
+
+Data load time was measured by breaking the LUBM dataset down into n3 formatted triples and then measuring both the time it took to load one million of those triples and the average load time per triple.
+
+Large queries were defined as a query that would return greater than 5\% of the total input size or more than 50,000 results in this instance.  We used the following query to return this large dataset.
+
+Small queries came in two varieties based on their complexity and was a query that would return less than 1\% of the total input size, or 1,000 results.  
 
 \section{Results}
 
