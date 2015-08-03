@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{llncs}
 \usepackage{cite}
 \usepackage{url}
 \title{RDF Triple Stores for Client-side Applications}
@@ -26,17 +26,29 @@ Much like Jena, Sesame is a framework that also includes a web front-end and nat
 \subsection{Testing Method}
 We used a modified version of the Lehigh University Benchmark (LUBM) \cite{Guo2005} to test performance and capability of the triple stores.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models, however this benchmark gave us an arbitrarily large set of data with RDFS classes that we could use for load testing.  We also modified the ontology provided to allow for RDFS inference in cases where OWL reasoning was required.
 
-To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores we were testing.  This framework measured three areas, data loading time, large query runtime, and rate small queries could be returned in parallel as queries per second.
+To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores we were testing.  This framework measured three areas, data loading time, large query runtime, and throughput of small queries.
 
-Data load time was measured by breaking the LUBM dataset down into n3 formatted triples and then measuring both the time it took to load one million of those triples and the average load time per triple.
+Data load time was measured by converting the LUBM dataset into groups of 10 n3 formatted triples and then measuring both the time it took to load one million of those groups and the average load time per group of triples.  These were loaded through the HTTP REST interfaces for each of the stores and the times were measured from the python script that was loading them.
 
-Large queries were defined as a query that would return greater than 5\% of the total input size or more than 50,000 results in this instance.  We used the following query to return this large dataset.
+Large queries were defined as a query that would be used to generate lists and as a starting point for more queries that would pull details out.  To simulate this we ask for the URIs of all students, professors, classes, departments and universities.  Once we have these we produce 1,000 smaller queries to ask for details about the individuals using increasingly complex queries.
 
-Small queries came in two varieties based on their complexity and was a query that would return less than 1\% of the total input size, or 1,000 results.  
+There were three small queries that were run 1,000 times initially asking for the details of a single student, then asking for the details for all professors in one university, and finally asking for the details for all students taking classes under a specific professor.  The average of these was used to produce the results.
+
 
 \section{Results}
+The results of the loading test shows a large difference between the materialized inference triple stores Sesame and Blazegraph and the query time inference model of Jena.
+
+\begin{tabular}{l | r r r r } Store & Total & Mean & Standard Deviation & Median \\ \hline Jena & 1776 & 0.013 & 0.101 & 0.005 \\ Blazegraph & 39341 & 0.309 & 0.429 & 0.012 \\ Sesame & 8414 & 0.066 & 0.205 & 0.035 \\ Sesame2 & 267644* & 21.037 & 20.964 & 10.883 \end{tabular}
+
+The second row for sesame is a setting with a higher inference level which greatly slowed down the load time was stopped only ~20\% through.
+
+The results of the small query performance shows that the inference at query time system Jena has much worse query performance over this large dataset.
+
+\begin{tabular}{l | r r r r } Store & Total & Mean & Standard Deviation & Median \\ \hline Jena & 4250 & 4.257 & 0.157 & 4.235 \\ Blazegraph & 738 & 0.033 & ? & ? \\ Sesame & ? & ? & ? & ? \\ Sesame2 & ? & ? & ? & ? \end{tabular}
+
 
 \section{Discussion}
+In client-side web applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different inference models.
 
 \bibliography{mybib}
 \bibliographystyle{plain}
