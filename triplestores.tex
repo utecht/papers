@@ -1,10 +1,12 @@
 \documentclass{llncs}
+\usepackage{listings}
 \usepackage{cite}
 \usepackage{url}
 \title{RDF Triple Stores for Client-side Applications}
 \author{Joseph Utecht}
 \date{July 2015}
 \begin{document}
+
 \maketitle
 \section{Introduction}
 
@@ -24,7 +26,7 @@ Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the
 Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native triple store with RDFS inference.
 
 \subsection{Testing Method}
-We used a modified version of the Lehigh University Benchmark (LUBM) \cite{Guo2005} to test performance and capability of the triple stores.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models, however this benchmark gave us an arbitrarily large set of data with RDFS classes that we could use for load testing.  We also modified the ontology provided to allow for RDFS inference in cases where OWL reasoning was required.
+We used a modified version of the Lehigh University Benchmark (LUBM) \cite{Guo2005} to test performance and capability of the triple stores.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models, however this benchmark gave us an arbitrarily large set of data with RDFS classes that we could use for load testing.
 
 To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores we were testing.  This framework measured three areas, data loading time, large query runtime, and throughput of small queries.
 
@@ -36,16 +38,91 @@ There were three small queries that were run 1,000 times initially asking for th
 
 
 \section{Results}
+\subsection{Load Test}
 The results of the loading test shows a large difference between the materialized inference triple stores Sesame and Blazegraph and the query time inference model of Jena.
 
-\begin{tabular}{l | r r r r } Store & Total & Mean & Standard Deviation & Median \\ \hline Jena & 1776 & 0.013 & 0.101 & 0.005 \\ Blazegraph & 39341 & 0.309 & 0.429 & 0.012 \\ Sesame & 8414 & 0.066 & 0.205 & 0.035 \\ Sesame2 & 267644* & 21.037 & 20.964 & 10.883 \end{tabular}
+\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 1776 & 13 & 101 & 5 \\ Blazegraph & 39341 & 309 & 429 & 12 \\ Sesame & 8414 & 66 & 205 & 35 \end{tabular}
 
-The second row for sesame is a setting with a higher inference level which greatly slowed down the load time was stopped only ~20\% through.
+\subsection{Benchmark}
 
-The results of the small query performance shows that the inference at query time system Jena has much worse query performance over this large dataset.
+This is a very simple query designed to test the minimum time that each triple store could return a single element.
 
-\begin{tabular}{l | r r r r } Store & Total & Mean & Standard Deviation & Median \\ \hline Jena & 4250 & 4.257 & 0.157 & 4.235 \\ Blazegraph & 738 & 0.033 & ? & ? \\ Sesame & ? & ? & ? & ? \\ Sesame2 & ? & ? & ? & ? \end{tabular}
+\begin{lstlisting}
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
+SELECT ?name
+WHERE { <STUDENT> ub:name ?name . }
+\end{lstlisting}
 
+\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 7.78 & 7 & 22 & 6 \\ Blazegraph & 37.36 & 38 & 27 & 32 \\ Sesame & 8.38 & 8 & 40 & 5 \end{tabular}
+
+\subsection{Query 1}
+
+The first query is to pull all of the information about a single student from many optional fields.  In an application this would be common for anything displaying details about a record.
+
+\begin{lstlisting}
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
+SELECT ?name ?advisor ?email ?telephone
+WHERE { optional {?x ub:name ?name .}
+        optional {?x ub:advisor ?advisor .}
+        optional {?x ub:email ?email .}
+        optional {?x ub:telephone ?telephone .}
+        values ?x { <STUDENT> }
+        }
+\end{lstlisting}
+
+\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 4396.23 & 4413 & 157 & 4396 \\ Blazegraph & 36.06 & 36 & 23 & 26 \\ Sesame & 253.97 & 256 & 36 & 253 \end{tabular}
+
+The query optimization and storage model of Blazegraph stands out here with the other two system's performance leaving much to be desired.
+
+\subsection{Authors}
+
+This is a very simple query testing minimal time with the possibility of multiple rows.
+
+\begin{lstlisting}
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
+SELECT ?X
+WHERE
+{?X ub:publicationAuthor <PAPER> .
+  }
+\end{lstlisting}
+
+\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 7.9 & 7 & 36 & 5 \\ Blazegraph & 37.11 & 37 & 47 & 32 \\ Sesame & 7.71 & 7 & 37 & 5 \end{tabular}
+
+\subsection{Pupils}
+
+Another simple query testing time with a single join and multiple row return.
+
+\begin{lstlisting}
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
+SELECT ?student
+WHERE {  ?student ub:takesCourse ?course .
+         <PROFESSOR> ub:teacherOf ?course .
+      }
+\end{lstlisting}
+
+\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 1545 & 1678 & 69 & 1677 \\ Blazegraph & 32.7 & 36 & 22 & 31 \\ Sesame & 7.48 & 8 & 28 & 6 \end{tabular}
+
+\subsection{Advisors}
+
+A highly selective query with multiple joins to test inference as both faculty and student are inferred relationships.
+
+\begin{lstlisting}
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
+SELECT ?X ?Y
+WHERE
+{?X rdf:type ub:Student .
+  ?Y rdf:type ub:Faculty .
+  ?X ub:advisor ?Y 
+  values ?Y { <PROFESSOR> }
+ }
+\end{lstlisting}
+
+\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 9.17 & 9 & 9 & 8 \\ Blazegraph & 34.91 & 38 & 44 & 33 \\ Sesame & 7.53 & 8 & 30 & 5 \end{tabular}
 
 \section{Discussion}
 In client-side web applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different inference models.
