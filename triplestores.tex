@@ -1,9 +1,11 @@
 \documentclass{llncs}
+\usepackage{llncsdoc}
 \usepackage{listings}
 \usepackage{cite}
 \usepackage{url}
 \title{RDF Triple Stores for Client-side Applications}
-\author{Joseph Utecht}
+\author{Joseph Utecht \and Mathias Brochhausen PhD}
+\institute{Department of Biomedical Informatics, University of Arkansas for Medical Sciences, Little Rock, AR}
 \date{July 2015}
 \begin{document}
 
@@ -41,7 +43,14 @@ There were three small queries that were run 1,000 times initially asking for th
 \subsection{Load Test}
 The results of the loading test shows a large difference between the materialized inference triple stores Sesame and Blazegraph and the query time inference model of Jena.
 
+\begin{table}
+\begin{center}
+\caption{Data load times}
 \begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 1776 & 13 & 101 & 5 \\ Blazegraph & 39341 & 309 & 429 & 12 \\ Sesame & 8414 & 66 & 205 & 35 \end{tabular}
+\\[5pt]
+This is a caption?
+\end{center}
+\end{table}
 
 \subsection{Benchmark}
 
@@ -54,7 +63,16 @@ SELECT ?name
 WHERE { <STUDENT> ub:name ?name . }
 \end{lstlisting}
 
+\smallskip
+
+\begin{table}
+\begin{center}
+\caption{Baseline Query time}
 \begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 7.78 & 7 & 22 & 6 \\ Blazegraph & 37.36 & 38 & 27 & 32 \\ Sesame & 8.38 & 8 & 40 & 5 \end{tabular}
+\\[5pt]
+This is a caption?
+\end{center}
+\end{table}
 
 \subsection{Query 1}
 
@@ -128,5 +146,5 @@ WHERE
 In client-side web applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different inference models.
 
 \bibliography{mybib}
-\bibliographystyle{plain}
+\bibliographystyle{splncs}
 \end{document}
