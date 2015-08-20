@@ -40,10 +40,9 @@ Large queries were defined as a query that would be used to generate lists and a
 There were three small queries that were run 1,000 times initially asking for the details of a single student, then asking for the details for all professors in one university, and finally asking for the details for all students taking classes under a specific professor.  The average of these was used to produce the results.
 
 \subsection{Queries}
-This is a very simple query designed to test the minimum time that each triple store could return a single element.
+To begin with we need a query to determine the minimum time that each system will be able to return a query.  Therefor we designed a query that would return a single object with a subject level lookup.  STUDENT is replaced with the URI of a random student pulled from a list of all students.
 
 \begin{lstlisting}[caption=Benchmark Query]
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?name
 WHERE { <STUDENT> ub:name ?name . }
@@ -51,10 +50,9 @@ WHERE { <STUDENT> ub:name ?name . }
 
 \smallskip
 
-The first query is to pull all of the information about a single student from many optional fields.  In an application this would be common for anything displaying details about a record.
+Query 1 simulates returning the details about an individual where fields are not required.  STUDENT is replaced with the URI of a random student pulled from a list of all students.
 
 \begin{lstlisting}[caption=Query 1]
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?name ?advisor ?email ?telephone
 WHERE { optional {?x ub:name ?name .}
@@ -67,10 +65,9 @@ WHERE { optional {?x ub:name ?name .}
 
 \smallskip
 
-This is a very simple query testing minimal time with the possibility of multiple rows.
+Query 2 returns all of the URIs of the authors on a given paper.  This is testing return time where multiple rows will be returned.  PAPER is replaced with a random URI of a paper.
 
 \begin{lstlisting}[caption=Query 2]
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?X
 WHERE
@@ -79,10 +76,9 @@ WHERE
 \end{lstlisting}
 \smallskip
 
-Another simple query testing time with a single join and multiple row return.
+Query 3 is an extension of query 2 except this has a join involved.  PROFESSOR is replaced with a random URI of a professor.
 
 \begin{lstlisting}[caption=Query 3]
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?student
 WHERE {  ?student ub:takesCourse ?course .
@@ -92,7 +88,7 @@ WHERE {  ?student ub:takesCourse ?course .
 
 \smallskip
 
-A highly selective query with multiple joins to test inference as both faculty and student are inferred relationships.
+Query 4 is a highly selective query with multiple joins to test inference as both faculty and student are inferred RDF-level relationships.  PROFESSOR is replaced with a random URI of a professor.
 
 \begin{lstlisting}[caption=Query 4]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -109,11 +105,9 @@ WHERE
 
 \section{Results}
 \subsection{Load Test}
-The results of the loading test shows a large difference between the materialized inference triple stores Sesame and Blazegraph and the query time inference model of Jena.
-
 \begin{table}
 \begin{center}
-\caption{Data load times}
+\caption{Data load times for 10 rows}
 \begin{tabular}{l | r r r r }
 Store & Total & Mean & Stdev & Median \\
 \hline
@@ -125,26 +119,33 @@ Sesame & 8414k & 66 & 205 & 35
 Measured in milliseconds
 \end{center}
 \end{table}
+The results of the loading test shows a large difference between the three storage models of the triple stores.  Blazegraph which has the largest number of indexes takes the longest to insert new data into.  Sesame which materializes the inferences being made also takes longer than Jena which is doing inferences at query runtime.
 
 \subsection{Queries}
 \begin{table}
 \begin{center}
-\caption{Data load times}
-\begin{tabular}{l | r r r r r r r r r r}
-Store & Baseline Query & $\overline{x}$ & Query 1 & $\overline{x}$ & Query 2 & $\overline{x}$ & Query 3 & $\overline{x}$ & Query 4 & $\overline{x}$ \\
+\caption{Mean query times for 1,000 queries}
+\begin{tabular}{l | r r r r r}
+    Store & Baseline Query $\overline{x}$ & Query 1 $\overline{x}$ & Query 2 $\overline{x}$ & Query 3 $\overline{x}$ & Query 4 $\overline{x}$ \\
 \hline
-Jena & 7.78k & 7 & 4396.23k & 4413 & 7.9k & 7 & 1545k & 1678 & 9.17k & 9 \\
-Blazegraph & 37.36k & 38 & 36.06k & 36 & 37.11 & 37 & 32.7 & 36 & 34.91 & 38\\
-Sesame & 8.38k & 8 & 253.97k & 256 & 7.71k & 7 & 7.48k & 8 & 7.53k & 8
+Jena & 8 & 4413 & 7 & 1678 & 151 \\
+Blazegraph & 38 & 36 & 37 & 36 & 38 \\
+Sesame & 8 & 253 & 8 & 8 & 7
 \end{tabular}
 \\[5pt]
 Measured in milliseconds
 \end{center}
 \end{table}
 
+Jena's performance was highly volatile based on the query.  The baseline speed was very fast as expected from the low number of indexes and the lack of inference in the baseline query.  The OPTIONAL keyword in the first query is known to cause potential slowdowns and takes a heavy toll on Jena.  Query 3 also has very poor performance but the reason for this is not clear.  The inference required for query 4 slows it down in comparison to both Blazegraph and Sesame as it must calculate the inference at query time.
+
+Blazegraph's large number of indexes and well established query optimizer result in extremely stable query results.  There appears to be a 30ms processing time on anything Blazegraph is doing, this could be the query optimizer or another part of the system. 
+
+Sesame showed the best performance overall only having problems with the OPTIONAL keyword in the first query.
+
 \section{Discussion}
-In client-side web applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different inference models.
+In client-side web applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different index and inference models.
 
 \bibliography{mybib}
-\bibliographystyle{splncs}
+\bibliographystyle{ieeetr}
 \end{document}
