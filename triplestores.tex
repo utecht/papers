@@ -1,6 +1,7 @@
 \documentclass{llncs}
 \usepackage{llncsdoc}
 \usepackage{listings}
+\lstset{frame=single,language=SQL,morekeywords={PREFIX},basicstyle=\footnotesize\ttfamily}
 \usepackage{cite}
 \usepackage{url}
 \title{RDF Triple Stores for Client-side Applications}
@@ -38,25 +39,10 @@ Large queries were defined as a query that would be used to generate lists and a
 
 There were three small queries that were run 1,000 times initially asking for the details of a single student, then asking for the details for all professors in one university, and finally asking for the details for all students taking classes under a specific professor.  The average of these was used to produce the results.
 
-
-\section{Results}
-\subsection{Load Test}
-The results of the loading test shows a large difference between the materialized inference triple stores Sesame and Blazegraph and the query time inference model of Jena.
-
-\begin{table}
-\begin{center}
-\caption{Data load times}
-\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 1776k & 13 & 101 & 5 \\ Blazegraph & 39341k & 309 & 429 & 12 \\ Sesame & 8414k & 66 & 205 & 35 \end{tabular}
-\\[5pt]
-Measured in milliseconds
-\end{center}
-\end{table}
-
-\subsection{Benchmark}
-
+\subsection{Queries}
 This is a very simple query designed to test the minimum time that each triple store could return a single element.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Benchmark Query]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?name
@@ -65,20 +51,9 @@ WHERE { <STUDENT> ub:name ?name . }
 
 \smallskip
 
-\begin{table}
-\begin{center}
-\caption{Baseline Query time}
-\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 7.78k & 7 & 22 & 6 \\ Blazegraph & 37.36k & 38 & 27 & 32 \\ Sesame & 8.38k & 8 & 40 & 5 \end{tabular}
-\\[5pt]
-Measured in milliseconds
-\end{center}
-\end{table}
-
-\subsection{Query 1}
-
 The first query is to pull all of the information about a single student from many optional fields.  In an application this would be common for anything displaying details about a record.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Query 1]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?name ?advisor ?email ?telephone
@@ -90,15 +65,11 @@ WHERE { optional {?x ub:name ?name .}
         }
 \end{lstlisting}
 
-\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 4396.23 & 4413 & 157 & 4396 \\ Blazegraph & 36.06 & 36 & 23 & 26 \\ Sesame & 253.97 & 256 & 36 & 253 \end{tabular}
-
-The query optimization and storage model of Blazegraph stands out here with the other two system's performance leaving much to be desired.
-
-\subsection{Authors}
+\smallskip
 
 This is a very simple query testing minimal time with the possibility of multiple rows.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Query 2]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?X
@@ -106,14 +77,11 @@ WHERE
 {?X ub:publicationAuthor <PAPER> .
   }
 \end{lstlisting}
-
-\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 7.9 & 7 & 36 & 5 \\ Blazegraph & 37.11 & 37 & 47 & 32 \\ Sesame & 7.71 & 7 & 37 & 5 \end{tabular}
-
-\subsection{Pupils}
+\smallskip
 
 Another simple query testing time with a single join and multiple row return.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Query 3]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?student
@@ -122,13 +90,11 @@ WHERE {  ?student ub:takesCourse ?course .
       }
 \end{lstlisting}
 
-\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 1545 & 1678 & 69 & 1677 \\ Blazegraph & 32.7 & 36 & 22 & 31 \\ Sesame & 7.48 & 8 & 28 & 6 \end{tabular}
-
-\subsection{Advisors}
+\smallskip
 
 A highly selective query with multiple joins to test inference as both faculty and student are inferred relationships.
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=Query 4]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?X ?Y
@@ -139,8 +105,42 @@ WHERE
   values ?Y { <PROFESSOR> }
  }
 \end{lstlisting}
+\clearpage
 
-\begin{tabular}{l | r r r r } Store & Total & Mean & Stdev & Median \\ \hline Jena & 9.17 & 9 & 9 & 8 \\ Blazegraph & 34.91 & 38 & 44 & 33 \\ Sesame & 7.53 & 8 & 30 & 5 \end{tabular}
+\section{Results}
+\subsection{Load Test}
+The results of the loading test shows a large difference between the materialized inference triple stores Sesame and Blazegraph and the query time inference model of Jena.
+
+\begin{table}
+\begin{center}
+\caption{Data load times}
+\begin{tabular}{l | r r r r }
+Store & Total & Mean & Stdev & Median \\
+\hline
+Jena & 1776k & 13 & 101 & 5 \\
+Blazegraph & 39341k & 309 & 429 & 12 \\
+Sesame & 8414k & 66 & 205 & 35
+\end{tabular}
+\\[5pt]
+Measured in milliseconds
+\end{center}
+\end{table}
+
+\subsection{Queries}
+\begin{table}
+\begin{center}
+\caption{Data load times}
+\begin{tabular}{l | r r r r r r r r r r}
+Store & Baseline Query & $\overline{x}$ & Query 1 & $\overline{x}$ & Query 2 & $\overline{x}$ & Query 3 & $\overline{x}$ & Query 4 & $\overline{x}$ \\
+\hline
+Jena & 7.78k & 7 & 4396.23k & 4413 & 7.9k & 7 & 1545k & 1678 & 9.17k & 9 \\
+Blazegraph & 37.36k & 38 & 36.06k & 36 & 37.11 & 37 & 32.7 & 36 & 34.91 & 38\\
+Sesame & 8.38k & 8 & 253.97k & 256 & 7.71k & 7 & 7.48k & 8 & 7.53k & 8
+\end{tabular}
+\\[5pt]
+Measured in milliseconds
+\end{center}
+\end{table}
 
 \section{Discussion}
 In client-side web applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different inference models.
