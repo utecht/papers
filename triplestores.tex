@@ -27,16 +27,16 @@ In this paper...
 
 We have decided to focus on Apache Jena \cite{Jena}, Blazegraph \cite{Blazegraph}, and Sesame \cite{Sesame} RDF stores for our testing due to their support for RDFS reasoning, open source licenses, ability to handle large datasets and REST endpoints for interaction. \cite{Voigt2012}
 
-Testing was performed on VirtualBox VM \cite{Virtualbox} with 2x 2.4 GHz 6-core Xeon processors and 8GB of ram.  The operating system was CentOS 7 \cite{Centos} and all of the stores were run through the Java application server Tomcat \cite{Tomcat}.
+Testing was performed on VirtualBox VM \cite{Virtualbox} with 2x 2.4 GHz 6-core Xeon processors and 8GB of ram.  The operating system was CentOS 7 \cite{Centos} and all of the stores were hosted on the Java application server Tomcat \cite{Tomcat}.
 
-Apache Jena uses a Java based front-end called Fuseki these are distributed under the Apache License 2.0.  Fuseki can either be run standalone or under a Java application server.  For the testing the most recent version Fuseki 2.0.0 under Tomcat was used with RDFS level reasoning.  Jena is highly customizable as to graph storage and inference model.
+Apache Jena uses a Java based front-end called Fuseki distributed under the Apache License 2.0.  Fuseki can either be run standalone or under a Java application server.  For the testing the most recent version Fuseki 2.0.0 under Tomcat was used with RDFS level reasoning.  Jena is highly customizable as to graph storage and inference model.
 
-Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the GPLv2 or a commercial license.  It can also either be run as a standalone or in a Java application server.  Blazegraph 1.5.1 under Tomcat was used for testing with a triple + inference graph.  Blazegraph uses up to six indexes to store the data and has a mature query optimizer \cite{RDFDatabaseSystems}.  If inference is enabled Blazegraph will materialize the inferences with a context allowed them to be removed if the RDF classes are modified.
+Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the GPLv2 or a commercial license.  It can also either be run as a standalone or in a Java application server.  Blazegraph 1.5.1 under Tomcat was used for testing with a triple + inference graph.  Blazegraph uses up to six indexes to store the data and has a mature query optimizer \cite{RDFDatabaseSystems}.  If inference is enabled Blazegraph will materialize the inferences with a context which allows them to be removed if the RDF classes are modified.
 
-Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native triple store with RDFS inference.  Sesame allows arbitrary indexes to be created when the graph is initialized we kept the default two.  Like Blazegraph, Sesame materializes RDF inference.
+Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native store and RDFS inference enabled.  Sesame allows arbitrary indexes to be created when the graph is initialized we kept the default two.  Like Blazegraph, Sesame materializes RDF inference.
 
 \subsection{Testing Method}
-We used the Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models, however this benchmark gave us an arbitrarily large set of data with RDFS classes that we could use for load testing.
+We used Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models, however this benchmark gave us an arbitrarily large set of data with RDFS classes that we could use for load testing.
 
 To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores we were testing.  This framework measured two areas, data loading time and throughput of small queries.
 
@@ -45,7 +45,7 @@ Data load time was measured by converting the LUBM dataset into groups of 10 n3 
 Large queries were used to generate lists and as a starting point for more queries that would pull details out.  To this end we ask for the URIs of all students, professors, classes, departments and universities.  Once we have these we produce five different versions of 1,000 smaller queries to ask for details using increasingly complex queries.
 
 \subsection{Queries}
-To begin with we need a query to determine the minimum time that each system will be able to return a query.  Therefor we designed a query that would return a single object with a subject level lookup.  STUDENT is replaced with the URI of a random student pulled from a list of all students.
+To begin a query to determine the minimum time that each system will be able to return a query is needed.  Therefor we designed a query that would return a single object with a subject level lookup.  STUDENT is replaced with the URI of a random student pulled from a list of all students.
 
 \begin{lstlisting}[caption=Benchmark Query]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
