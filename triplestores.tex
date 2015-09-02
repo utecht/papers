@@ -14,11 +14,15 @@
 \begin{document}
 
 \maketitle
+
+\begin{abstract}
+Although many RDF triple store performance measures have been published, there appears to be a gap when it comes to their use as the primary data source for applications.  The performance needs for this use case differ from the more traditional use of reasoning and inference over large data sets.  To approach this problem we have attempted to emulate the type of demands this use would create and measure the performance of four modern open source stores.
+\end{abstract}
 \section{Introduction}
 
-Trauma Centers and trauma systems have been proven to increase the positive outcome in trauma care \cite{pmid16427544, pmid21206286, pmid26151508}. However, comparison of trauma centers and of trauma systems and the patient outcome created by them is obstructed by a lack of comparability regarding the organizational components and the terms used to refer to organizational structures and roles. The NIH-funded project \textit{Comparative Assessment For Environments of trauma care} (CAFE) (1R01GM111324-01A1)  aims to develop a semantically driven, web-based IT framework to collect data about the organizational structure of trauma centers and trauma system and to allow comparison of different structures for either trauma centers or trauma systems.To achieve that CAFE will create knowledge resource based on an RDF triple store to store data about the organizational structure of both trauma centers and trauma systems. Knowledge about types of entities relevant to the domain will be provided by an ontology coded in Web Ontology Language 2 (OWL2) \cite{OWL2}. The system will allow users to enter data about the organizational structure of a trauma center or a trauma system. The information will be captured in RDF and the progress in entering data will be perceivable to user by the growing graphical representation of the organizational structure. In the next step the user can request a comparison of their organization with canonical organizations of the same type. The data about those organizations will be stored in the triple store. The system will run a set of queries that retrieve data that allows representing the same organizational units described by the users data and their interrelations. The user will be presented with two graphical representations: their own organization and a canonical organization of the same type.
+Trauma Centers and trauma systems have been proven to increase the positive outcome in trauma care \cite{pmid16427544, pmid21206286, pmid26151508}. However, comparison of trauma centers and of trauma systems and the patient outcome created by them is obstructed by a lack of comparability regarding the organizational components and the terms used to refer to organizational structures and roles. The NIH-funded project \textit{Comparative Assessment For Environments of trauma care} (CAFE) (1R01GM111324-01A1)  aims to develop a semantically driven, web-based IT framework to collect data about the organizational structure of trauma centers and trauma systems and to allow comparison of different structures for either trauma centers or trauma systems. To achieve that CAFE will create a knowledge resource based on an RDF triple store to store data about the organizational structure of both trauma centers and trauma systems. Knowledge about types of entities relevant to the domain will be provided by an ontology coded in Web Ontology Language 2 (OWL2) \cite{OWL2}. The system will allow users to enter data about the organizational structure of a trauma center or a trauma system. The information will be captured in RDF and the progress in entering data will be perceivable to user by the growing graphical representation of the organizational structure. In the next step the user can request a comparison of their organization with canonical organizations of the same type. The data about those organizations will be stored in the triple store. The system will run a set of queries that retrieve data that allows representing the same organizational units described by the users data and their interrelations. The user will be presented with two graphical representations: their own organization and a canonical organization of the same type.
 
-RDF triple stores are not generally used as the primary data storage means for an application.  Because of this, most studies tend to focus on the performance of triple stores as it relates to reasoning and complex queries over large data sets.  The CAFE project requires the ability to insert, reason and query data in as close to real time as is possible so the user experience does not suffer.  We would like to attempt to use a triple store to perform all of these duties.  In this paper we will attempt to measure the performance of various RDF triple stores as they would be used to drive an application.
+RDF triple stores are not generally used as the primary data storage means for an application.  Because of this, most studies tend to focus on the performance of triple stores as it relates to reasoning and complex queries over large data sets.  The CAFE project requires the ability to insert, reason and query data in as close to real time as is possible so the user experience does not suffer.  We would like to attempt to use an RDF triple store to perform all of these duties.  In this paper we will attempt to measure the performance of various RDF triple stores as they would be used to drive an application.
 
 \section{Material and Methods}
 \subsection{RDF Triple Stores}
@@ -34,7 +38,7 @@ Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the
 Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native store and RDFS inference enabled.  Sesame allows arbitrary indexes to be created when the graph is initialized we kept the default two.  Like Blazegraph, Sesame materializes RDF inference.
 
 \subsection{Testing Method}
-We used Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models, however this benchmark gave us an arbitrarily large set of data with RDFS classes that we could use for load testing.
+We used Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores. LUBM is a way to produce a synthetic dataset of arbitrary size.  The data produced represents the people and activities of a university setting.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models.
 
 To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores we were testing.  This framework measured two areas, data loading time and throughput of small queries.
 
@@ -53,7 +57,7 @@ WHERE { <STUDENT> ub:name ?name . }
 
 \smallskip
 
-Query 1 simulates returning the details about an individual where fields are not required.  The OPTIONAL keyword can potentially cause long query runtimes so this is a naive query.  STUDENT is replaced with the URI of a random student pulled from a list of all students.
+Query 1 simulates returning the details about an individual where fields are not required to be present.  The OPTIONAL keyword can potentially cause long query runtimes so this is a naive approach to this query.  In the query STUDENT is replaced with the URI of a random student pulled from a list of all students.
 
 \begin{lstlisting}[caption=Query 1]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
@@ -79,7 +83,7 @@ WHERE
 \end{lstlisting}
 \smallskip
 
-Query 3 also returns multiple rows except it also has a join involved.  PROFESSOR is replaced with a random URI of a professor.
+Query 3 also returns multiple rows and also has a join involved.  PROFESSOR is replaced with a random URI of a professor.
 
 \begin{lstlisting}[caption=Query 3]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
@@ -91,7 +95,7 @@ WHERE {  ?student ub:takesCourse ?course .
 
 \smallskip
 
-Query 4 is a highly selective query with multiple joins to test inference as both faculty and student are inferred RDF-level relationships.  PROFESSOR is replaced with a random URI of a professor.
+Query 4 is a highly selective query to test inference as both faculty and student are inferred RDF-level relationships.
 
 \begin{lstlisting}[caption=Query 4]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -104,7 +108,6 @@ WHERE
   values ?faculty { <PROFESSOR> }
  }
 \end{lstlisting}
-\clearpage
 
 \section{Results}
 \subsection{Load Test}
@@ -122,7 +125,7 @@ Sesame & 8414k & 66 & 205 & 35
 Measured in milliseconds
 \end{center}
 \end{table}
-The results of the loading test show a large difference between the three storage models of the triple stores.  Blazegraph which has the largest number of indexes takes the longest to insert new data into.  Sesame which materializes the inferences being made also takes longer than Jena which is doing inferences at query runtime.
+The results of the loading test show a large difference between the three storage models of the triple stores.  Blazegraph which has the largest number of indexes takes the longest to insert new data into. Sesame and Jena have similar numbers of indexes, however Sesame is materializing the inferences and thus has slower load times.
 
 \subsection{Queries}
 \begin{table}
@@ -142,12 +145,15 @@ Measured in milliseconds
 
 Jena's performance was highly volatile based on the query.  The baseline speed was very fast as expected from the low number of indexes and the lack of inference in the baseline query.  The OPTIONAL keyword in the first query is known to cause potential slowdowns and takes a heavy toll on Jena.  Query 3 also has very poor performance but the reason for this is not clear.  The inference required for query 4 slows it down in comparison to both Blazegraph and Sesame as it must calculate the inference at query time.
 
-Blazegraph's large number of indexes and well established query optimizer result in extremely stable query results.  There appears to be a 30ms processing time on anything Blazegraph is doing, this could be the query optimizer or another part of the system. 
+Blazegraph's large number of indexes and well established query optimizer result in extremely stable query results.  There however appears to be a 30ms processing time on anything Blazegraph is doing, this could be the query optimizer or another part of the system. 
 
 Sesame showed the best performance overall only having problems with the OPTIONAL keyword in the first query.
 
 \section{Discussion}
 In applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different index and inference models.
+
+\section*{Acknowledgement}
+This is where we thank the NIH XXXXXX
 
 \bibliography{mybib}
 \bibliographystyle{ieeetr}
