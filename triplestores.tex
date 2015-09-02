@@ -1,7 +1,7 @@
 \documentclass{llncs}
 \usepackage{llncsdoc}
 \usepackage{listings}
-\lstset{frame=single,language=SQL,morekeywords={PREFIX},basicstyle=\footnotesize\ttfamily}
+\lstset{frame=single,language=SQL,morekeywords={PREFIX},basicstyle=\small\ttfamily}
 \usepackage{cite}
 \usepackage{url}
 \usepackage[utf8]{inputenc}
@@ -66,8 +66,7 @@ WHERE { optional {?x ub:name ?name .}
         optional {?x ub:advisor ?advisor .}
         optional {?x ub:email ?email .}
         optional {?x ub:telephone ?telephone .}
-        values ?x { <STUDENT> }
-        }
+        values ?x { <STUDENT> } }
 \end{lstlisting}
 
 \smallskip
@@ -78,8 +77,7 @@ Query 2 returns all of the URIs of the authors on a given paper.  This is testin
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?author
 WHERE
-{?author ub:publicationAuthor <PAPER> .
-  }
+{ ?author ub:publicationAuthor <PAPER> . }
 \end{lstlisting}
 \smallskip
 
@@ -88,9 +86,8 @@ Query 3 also returns multiple rows and also has a join involved.  PROFESSOR is r
 \begin{lstlisting}[caption=Query 3]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?student
-WHERE {  ?student ub:takesCourse ?course .
-         <PROFESSOR> ub:teacherOf ?course .
-      }
+WHERE { ?student ub:takesCourse ?course .
+        <PROFESSOR> ub:teacherOf ?course . }
 \end{lstlisting}
 
 \smallskip
@@ -102,15 +99,13 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?student ?faculty
 WHERE
-{?student rdf:type ub:Student .
+{ ?student rdf:type ub:Student .
   ?faculty rdf:type ub:Faculty .
   ?student ub:advisor ?faculty 
-  values ?faculty { <PROFESSOR> }
- }
+  values ?faculty { <PROFESSOR> } }
 \end{lstlisting}
 
 \section{Results}
-\subsection{Load Test}
 \begin{table}
 \begin{center}
 \caption{Data load times for 10 triples}
@@ -127,7 +122,6 @@ Measured in milliseconds
 \end{table}
 The results of the loading test show a large difference between the three storage models of the triple stores.  Blazegraph which has the largest number of indexes takes the longest to insert new data into. Sesame and Jena have similar numbers of indexes, however Sesame is materializing the inferences and thus has slower load times.
 
-\subsection{Queries}
 \begin{table}
 \begin{center}
 \caption{Mean runtime for 1,000 queries}
