@@ -27,27 +27,27 @@ RDF triple stores are not generally used as the primary data storage means for a
 \section{Material and Methods}
 \subsection{RDF Triple Stores}
 
-We have decided to focus on Apache Jena \footnote{\url{https://jena.apache.org/}}, Blazegraph \footnote{\url{http://www.blazegraph.com/bigdata}}, and Sesame \footnote{\url{http://rdf4j.org/}}  RDF stores for our testing due to their support for RDFS reasoning, open source licenses, ability to handle large datasets and REST endpoints for interaction. \cite{Voigt2012}
+We have decided to focus on Apache Jena \footnote{\url{https://jena.apache.org/}}, Blazegraph \footnote{\url{http://www.blazegraph.com/bigdata}}, and Sesame \footnote{\url{http://rdf4j.org/}}  RDF stores for our testing due to their support for RDFS reasoning, open source licenses, ability to handle large datasets, and REST endpoints for interaction. \cite{Voigt2012}
 
-Testing was performed on VirtualBox VM \footnote{\url{https://www.virtualbox.org/}} with 2x 2.4 GHz 6-core Xeon processors and 8GB of ram.  The operating system was CentOS 7 \footnote{\url{https://www.centos.org/}} and all of the stores were hosted on the Java application server Tomcat \footnote{\url{http://tomcat.apache.org/}}.
+Testing was performed on a VirtualBox VM \footnote{\url{https://www.virtualbox.org/}} with 2x 2.4 GHz 6-core Xeon processors and 8GB of ram.  The operating system was CentOS 7 \footnote{\url{https://www.centos.org/}} and all of the stores were hosted on the Java application server Tomcat \footnote{\url{http://tomcat.apache.org/}}.
 
-Apache Jena uses a Java based front-end called Fuseki distributed under the Apache License 2.0.  Fuseki can either be run standalone or under a Java application server.  For the testing the most recent version Fuseki 2.0.0 under Tomcat was used with RDFS level reasoning.  Jena is highly customizable as to graph storage and inference model.
+Apache Jena uses a Java based front-end called Fuseki distributed under the Apache License 2.0.  Fuseki can either be run standalone or under a Java application server.  For the testing, the most recent version Fuseki 2.0.0 under Tomcat was used with RDFS level reasoning.
 
 Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the GPLv2 or a commercial license.  It can also either be run as a standalone or in a Java application server.  Blazegraph 1.5.1 under Tomcat was used for testing with a triple + inference graph.  Blazegraph uses up to six indexes to store the data and has a mature query optimizer \cite{RDFDatabaseSystems}.  If inference is enabled Blazegraph will materialize the inferences with a context which allows them to be removed if the RDF classes are modified.
 
-Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native store and RDFS inference enabled.  Sesame allows arbitrary indexes to be created when the graph is initialized we kept the default two.  Like Blazegraph, Sesame materializes RDF inference.
+Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native store and RDFS inference enabled.  Sesame allows arbitrary indexes to be created when the graph is initialized but we kept the default two.  Like Blazegraph, Sesame materializes RDF inference when data is added.
 
 \subsection{Testing Method}
-We used Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores. LUBM is a way to produce a synthetic dataset of arbitrary size.  The data produced represents the people and activities of a university setting.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models.
+We used Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores. LUBM is a way to produce a synthetic dataset of arbitrary size.  The data produced represents people and activities in a university setting.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models.
 
 To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores we were testing.  This framework measured two areas, data loading time and throughput of small queries.
 
-Data load time was measured by converting the LUBM dataset into groups of 10 n3 formatted triples and then measuring both the time it took to load one million of those groups and the average load time per group of triples.  These were loaded through the HTTP REST interfaces for each of the stores and the times were measured from the python script that was loading them.
+Data load time was measured by converting the LUBM dataset into groups of 10 n3 formatted triples and then measuring the time it took to load one million of those groups.  These were loaded through the HTTP REST interfaces for each of the stores and the times were measured from the python script that was loading them.
 
-Large queries were used to generate lists and as a starting point for more queries that would pull details out.  To this end we ask for the URIs of all students, professors, classes, departments and universities.  Once we have these we produce five different versions of 1,000 smaller queries to ask for details using increasingly complex queries.
+SPARQL queries were used to generate lists of URIs as a starting point for the small queries with which we were testing query runtime.  To this end we queried for the URIs of all students, professors, classes, departments and universities.  Once we had these we ran the five queries below 1,000 times through the HTTP REST interface measuring the response time with a python script.
 
 \subsection{Queries}
-To begin a query to determine the minimum time that each system will be able to return a query is needed.  Therefor we designed a query that would return a single object with a subject level lookup.  STUDENT is replaced with the URI of a random student pulled from a list of all students.
+To begin, a query to determine the baseline time that each system will be able to return a query is needed.  Therefor we designed a query that would return a single object with a subject level lookup, which should be the fastest possible lookup operation for any store.  STUDENT is replaced with the URI of a random student pulled from a list of all students.
 
 \begin{lstlisting}[caption=Benchmark Query]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
@@ -57,7 +57,7 @@ WHERE { <STUDENT> ub:name ?name . }
 
 \smallskip
 
-Query 1 simulates returning the details about an individual where fields are not required to be present.  The OPTIONAL keyword can potentially cause long query runtimes so this is a naive approach to this query.  In the query STUDENT is replaced with the URI of a random student pulled from a list of all students.
+Query 1 simulates returning the details about an individual where fields are not required to be present.  The \emph{optional} keyword can potentially cause long runtimes so this is a naive approach to this query.  In the query STUDENT is replaced with the URI of a random student pulled from a list of all students.
 
 \begin{lstlisting}[caption=Query 1]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
@@ -92,7 +92,7 @@ WHERE { ?student ub:takesCourse ?course .
 
 \smallskip
 
-Query 4 is a highly selective query to test inference as both faculty and student are inferred RDF-level relationships.
+Query 4 is a highly selective query to test inference as both ub:Faculty and ub:Student are inferred RDF-level relationships.
 
 \begin{lstlisting}[caption=Query 4]
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -137,17 +137,18 @@ Measured in milliseconds
 \end{center}
 \end{table}
 
-Jena's performance was highly volatile based on the query.  The baseline speed was very fast as expected from the low number of indexes and the lack of inference in the baseline query.  The OPTIONAL keyword in the first query is known to cause potential slowdowns and takes a heavy toll on Jena.  Query 3 also has very poor performance but the reason for this is not clear.  The inference required for query 4 slows it down in comparison to both Blazegraph and Sesame as it must calculate the inference at query time.
+Jena's performance was highly volatile based on the query.  The baseline speed was very fast as expected from the low number of indexes and the lack of inference in the baseline query.  The \emph{optional} keyword in the first query is known to cause potential slowdowns and takes a heavy toll on Jena.  Query 3 also has very poor performance but the reason for this is not clear.  The inference required for query 4 slows it down in comparison to both Blazegraph and Sesame as it must calculate the inference at query time.
 
 Blazegraph's large number of indexes and well established query optimizer result in extremely stable query results.  There however appears to be a 30ms processing time on anything Blazegraph is doing, this could be the query optimizer or another part of the system. 
 
-Sesame showed the best performance overall only having problems with the OPTIONAL keyword in the first query.
+Sesame showed the best performance overall only having problems with the \emph{optional} keyword in the first query.
 
-\section{Discussion}
+\section{Conclusion}
 In applications response time is important for keeping users happy.  Understanding why triple stores perform the way they do is helpful in choosing the correct one for any given project.  We have demonstrated the large performance differences that can appear even in relatively small datasets between the different index and inference models.
 
-\section*{Acknowledgement}
-This is where we thank the NIH XXXXXX
+\medskip
+\noindent
+\textbf{Acknowledgement} This is where we thank the NIH XXXXXX
 
 \bibliography{mybib}
 \bibliographystyle{ieeetr}
