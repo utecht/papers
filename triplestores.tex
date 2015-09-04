@@ -16,7 +16,7 @@
 \maketitle
 
 \begin{abstract}
-Although many RDF triple store performance measures have been published, there appears to be a gap when it comes to their use as the primary data source for applications.  The performance needs for this use case differ from the more traditional use of reasoning and inference over large data sets.  To approach this problem we have attempted to emulate the type of demands this use would create and measure the performance of four modern open source stores.
+Although many RDF triple store performance measure have been published, there appears to be a gap when it comes to their use as the primary storage for applications.  The performance needs for this use case differ from the triple stores more traditional use of reasoning and inference over large data sets. The primary objective of this research is to determine the feasibility of modern RDF triple stores to be used as the primary storage for a responsive application. To make this determination we measured the load time of 1,000,000 triples of synthetic data and then ran various queries to emulate the types of demands this use would create. The resulting time measurements showed a difference in load times between the different stores and a large range of results in query performance.  The lower end results are fast enough to compete with traditional relational databases while the results on the high end would not be suitable for this use case. The varied performance showed that while it was certainly possible to use triple stores in this way the developer must be careful with query design and understand some of the performance implications of different storage models that various stores offer.
 \end{abstract}
 \section{Introduction}
 
