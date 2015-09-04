@@ -7,7 +7,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern} % load a font with all the characters
-\title{RDF Triple Store Performance For Applications}
+\title{Measuring the Usability of Triple Stores for Knowledge Management on Trauma Care Organizations}
 \author{Joseph Utecht \and Mathias Brochhausen PhD}
 \institute{Department of Biomedical Informatics, University of Arkansas for Medical Sciences, Little Rock, AR}
 \date{July 2015}
@@ -16,7 +16,7 @@
 \maketitle
 
 \begin{abstract}
-Although many RDF triple store performance measure have been published, there appears to be a gap when it comes to their use as the primary storage for applications.  The performance needs for this use case differ from the triple stores more traditional use of reasoning and inference over large data sets. The primary objective of this research is to determine the feasibility of modern RDF triple stores to be used as the primary storage for a responsive application. To make this determination we measured the load time of just over one million triples of synthetic data and then ran various queries to emulate the types of demands this use would create. The resulting time measurements showed a difference in load times between the different stores and a large range of results in query performance.  The lower end results are fast enough to compete with traditional relational databases while the results on the high end would not be suitable for this use case. The varied performance showed that while it was certainly possible to use triple stores in this way the developer must be careful with query design and understand some of the performance implications of different storage models that various stores offer.
+The CAFE project aims to provide a semantic web technology-based approach to compare the organizational structures of trauma centers and trauma systems. To achieve this we plan to use an RDF triple store that employs automatic inferences based on OWL representations. In order to engage users with the CAFE application real time feedback is a requirement. Although many RDF triple store performance measure have been published, there appears to be a gap when it comes to their use as the primary storage for real time applications.  The performance needs for this use case differ from the triple stores more traditional use of offline reasoning and inference over large data sets. The objective of this research is to determine the feasibility of modern RDF triple stores as the primary storage for a real time application. To make this determination we measured the load time of just over one million triples of synthetic data and then ran various queries to emulate the types of demands this use would create. The resulting time measurements showed a difference in load times between the different stores and a large range of results in query performance.  The lower end results are fast enough to compete with traditional relational databases while the results on the high end would not be suitable for this use case. The conclusion of this for the CAFE project is that we will be able to use a triple store, but we need to use the performance implications gained from this study to carefully tailor the queries we will run.
 \end{abstract}
 \section{Introduction}
 
