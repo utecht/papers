@@ -71,6 +71,8 @@ WHERE { optional {?x ub:name ?name .}
 
 \smallskip
 
+Because of the performance implications of the \emph{optional} keyword a second method for querying of the same information was performed.  This query 1.5 was actually 4 separate queries each asking for one piece of the original data returned by query 1.  Time on this query was a measure of how long it took to perform all 4 queries.
+
 Query 2 returns all of the URIs of the authors on a given paper.  This is testing return time where multiple rows will be returned.  PAPER is replaced with a random URI of a paper.
 
 \begin{lstlisting}[caption=Query 2]
@@ -125,12 +127,12 @@ The results of the loading test show a large difference between the three storag
 \begin{table}
 \begin{center}
 \caption{Mean runtime for 1,000 queries}
-\begin{tabular}{l | r r r r r}
-    Store & Baseline Query $\overline{x}$ & Query 1 $\overline{x}$ & Query 2 $\overline{x}$ & Query 3 $\overline{x}$ & Query 4 $\overline{x}$ \\
+\begin{tabular}{l | r r r r r r}
+    Store & Baseline $\overline{x}$ & Query 1 $\overline{x}$ & Query 1.5 $\overline{x}$ & Query 2 $\overline{x}$ & Query 3 $\overline{x}$ & Query 4 $\overline{x}$ \\
 \hline
-Jena & 8 & 4413 & 7 & 1678 & 151 \\
-Blazegraph & 38 & 36 & 37 & 36 & 38 \\
-Sesame & 8 & 253 & 8 & 8 & 7
+Jena & 8 & 4413 & 29 & 7 & 1678 & 151 \\
+Blazegraph & 38 & 36 & 146 & 37 & 36 & 38 \\
+Sesame & 8 & 253 & 29 & 8 & 8 & 7
 \end{tabular}
 \\[5pt]
 Measured in milliseconds
