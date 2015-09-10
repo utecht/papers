@@ -52,7 +52,9 @@ To begin, a query to determine the baseline time that each system will be able t
 \begin{lstlisting}[caption=Benchmark Query]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?name
-WHERE { <STUDENT> ub:name ?name . }
+WHERE {
+        <STUDENT> ub:name ?name .
+      }
 \end{lstlisting}
 
 \smallskip
@@ -62,11 +64,13 @@ Query 1 simulates returning the details about an individual where fields are not
 \begin{lstlisting}[caption=Query 1]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?name ?advisor ?email ?telephone
-WHERE { optional {?x ub:name ?name .}
+WHERE {
+        optional {?x ub:name ?name .}
         optional {?x ub:advisor ?advisor .}
         optional {?x ub:email ?email .}
         optional {?x ub:telephone ?telephone .}
-        values ?x { <STUDENT> } }
+        values ?x { <STUDENT> }
+      }
 \end{lstlisting}
 
 \smallskip
@@ -78,8 +82,9 @@ Query 2 returns all of the URIs of the authors on a given paper.  This is testin
 \begin{lstlisting}[caption=Query 2]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?author
-WHERE
-{ ?author ub:publicationAuthor <PAPER> . }
+WHERE {
+        ?author ub:publicationAuthor <PAPER> .
+      }
 \end{lstlisting}
 \smallskip
 
@@ -88,8 +93,10 @@ Query 3 also returns multiple rows and also has a join involved.  PROFESSOR is r
 \begin{lstlisting}[caption=Query 3]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?student
-WHERE { ?student ub:takesCourse ?course .
-        <PROFESSOR> ub:teacherOf ?course . }
+WHERE {
+        ?student ub:takesCourse ?course .
+        <PROFESSOR> ub:teacherOf ?course .
+      }
 \end{lstlisting}
 
 \smallskip
@@ -100,11 +107,12 @@ Query 4 is a highly selective query to test inference as both ub:Faculty and ub:
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
 SELECT ?student ?faculty
-WHERE
-{ ?student rdf:type ub:Student .
-  ?faculty rdf:type ub:Faculty .
-  ?student ub:advisor ?faculty 
-  values ?faculty { <PROFESSOR> } }
+WHERE {
+        ?student rdf:type ub:Student .
+        ?faculty rdf:type ub:Faculty .
+        ?student ub:advisor ?faculty 
+        values ?faculty { <PROFESSOR> }
+       }
 \end{lstlisting}
 
 \section{Results}
