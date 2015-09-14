@@ -44,7 +44,7 @@ To service a high performing client-side application the triple store must be ab
 
 Data load time was measured by converting the LUBM dataset into groups of 10 n3 formatted triples and then measuring the time it took to load one million of those groups.  These were loaded through the HTTP REST interfaces for each of the stores and the times were measured from the python script that was loading them.
 
-SPARQL queries were used to generate lists of URIs as a starting point for the small queries with which we were testing query runtime.  To this end we queried for the URIs of all students, professors, classes, departments and universities.  Once we had these we ran the five queries below 1,000 times through the HTTP REST interface measuring the response time with a python script.
+SPARQL queries were used to generate lists of URIs as a starting point for the small queries with which we were testing query runtime.  To this end we queried for the URIs of all students, professors, classes, departments and universities.  Once we had these, we ran the five queries below 1,000 times through the HTTP REST interface measuring the response time with a python script.
 
 \subsection{Relational Database Baseline}
 To have a baseline to measure the performance of the RDF triple stores we decided to use a relational database performing close to the same task.  To accomplish this we converted a subset of the LUBM data into a relational format and loaded it into a MariaDB \footnote{\url{https://mariadb.org/}} installation on an identical VM to the triple stores. Once the data was converted and loaded, indexes were places upon the columns which would act as keys. To make the comparison closer, a miniature HTTP REST interface was created in Python's Flask framework \footnote{\url{http://flask.pocoo.org/}}. This interface would take a key as an HTTP parameter and then run a SQL query to the database returning the results as JSON encoded data \footnote{\url{http://json.org/}}. As we were not interested in attempting a comparison between the relative run times of SQL vs SPARQL queries only two simple SQL queries were used to determine the baseline time this relational database setup would return data.
@@ -80,7 +80,7 @@ WHERE {
 
 \smallskip
 
-Because of the performance implications of the \emph{optional} keyword a second method for querying of the same information was performed.  Query 1.5 was actually 4 separate queries each asking for one piece of the original data returned by query 1.  Time on this query was a measure of how long it took to perform all 4 queries.
+Because of the performance implications of the \emph{optional} keyword a second method for querying the same information was performed.  Query 1.5 was actually 4 separate queries each asking for one piece of the original data returned by query 1.  Time on this query was a measure of how long it took to perform all 4 queries.
 
 \begin{lstlisting}[caption=Sample of Query 1.5]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
@@ -103,7 +103,7 @@ WHERE {
 \end{lstlisting}
 \smallskip
 
-Query 3 also returns multiple rows and also has a join involved.  PROFESSOR is replaced with a random URI of a professor.
+Query 3 uses a join while also returning multiple rows.  PROFESSOR is replaced with a random URI of a professor.
 
 \begin{lstlisting}[caption=Query 3]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
@@ -131,8 +131,6 @@ WHERE {
 \end{lstlisting}
 
 \section{Results}
-The relational database baseline returned on average in 5ms for a single row lookup and 6ms for a join.
-
 \begin{table}
 \begin{center}
 \caption{Data load times for 10 triples}
@@ -151,6 +149,24 @@ The results of the loading test show a large difference between the three storag
 
 \begin{table}
 \begin{center}
+\caption{Query baseline for relational database}
+\begin{tabular}{l | r r }
+    Store & Mean & Stdev \\
+\hline
+Single Row Select & 4.8 & 0.9 \\
+Select With Join & 5.6 & 8.6 
+\end{tabular}
+\\[5pt]
+Measured in milliseconds
+\end{center}
+\end{table}
+
+The relational database baseline queries were both very fast. These numbers are close to the minimum time a lookup could be performed using the HTTP REST system and therefor are a good measure for results from the RDF triple stores. 
+
+\clearpage
+
+\begin{table}
+\begin{center}
 \caption{Mean runtime for 1,000 queries}
 \begin{tabular}{l | r | r | r | r | r | r}
     Store & Baseline $\overline{x}$ & Query 1 $\overline{x}$ & Query 1.5 $\overline{x}$ & Query 2 $\overline{x}$ & Query 3 $\overline{x}$ & Query 4 $\overline{x}$ \\
@@ -164,14 +180,14 @@ Measured in milliseconds
 \end{center}
 \end{table}
 
-Jena's performance was highly volatile based on the query.  The baseline speed was very fast as expected from the low number of indexes and the lack of inference in the baseline query.  The \emph{optional} keyword in the first query is known to cause potential slowdowns and takes a heavy toll on Jena.  Query 3 also has very poor performance but the reason for this is not clear.  The inference required for query 4 slows it down in comparison to both Blazegraph and Sesame as it must calculate the inference at query time.
+Jena's performance was highly volatile based on the query.  The baseline speed was only a few milliseconds slower than the relational system as expected from the low number of indexes and the lack of inference in the baseline query.  The \emph{optional} keyword in the first query is known to cause potential slowdowns and takes a heavy toll on Jena.  Query 3 also has very poor performance but the reason for this is not clear.  The inference required for query 4 slows it down in comparison to both Blazegraph and Sesame as it must calculate the inference at query time.
 
-Blazegraph's large number of indexes and well established query optimizer result in extremely stable query time.  Blazegraph was the only store that did not take a performance hit from the \emph{optional} keyword in the first query.  There however appears to be a 30ms processing time on anything Blazegraph is doing, of which we were unable to locate the cause. 
+Blazegraph's large number of indexes and well established query optimizer result in extremely stable query time.  Blazegraph was the only store that did not take a performance hit from the \emph{optional} keyword in the first query.  There however appears to be a 30ms processing time on anything Blazegraph is doing, of which we were unable to locate the cause.  Because of this 30ms delay, all of Blazegraph's response rates were significantly slower than the relational system.
 
-Sesame showed the best performance overall only having problems with the \emph{optional} keyword in the first query.
+Sesame showed the best performance overall being only a few milliseconds above the relational system.  Its only problems was with the \emph{optional} keyword in the first query.
 
 \section{Conclusion}
-This paper examined the performance of RDf triple stores for query throughput in a real time application and compared it to the performance of a relational database.  We found that performance in two of the stores, Jena and Sesame, were within a few milliseconds as a highly optimized relational databases for some queries.  Based on the performance we will move forward with our plans to use an RDF triple store as the primary storage for the real time web application in the CAFE project.
+This paper examined the performance of RDf triple stores for query throughput in a real time application and compared it to the performance of a relational database.  We found that performance in two of the stores, Jena and Sesame, were within a few milliseconds of a highly optimized relational databases for some queries.  Based on the performance we will move forward with our plans to use an RDF triple store as the primary storage for the real time web application in the CAFE project.
 
 \medskip
 \noindent
