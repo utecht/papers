@@ -38,7 +38,7 @@ Systrap's Blazegraph (formerly known as Bigdata) is distributed under either the
 Much like Jena, Sesame is a framework that also includes a web front-end and native triple store.  Sesame version 2.8.4 was used for testing with a native store and RDFS inference enabled.  Sesame allows arbitrary indexes to be created when the graph is initialized but we kept the default two.  Like Blazegraph, Sesame materializes RDF inference when data is added.
 
 \subsection{Testing Method}
-We used Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores. LUBM was used to produce a synthetic dataset of arbitrary size, that represents people and activities in an academic setting, such ad students, professors, classs, departments, and universities.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models.
+We used Lehigh University Benchmark (LUBM) \cite{Guo2005} generated data to test performance and capability of the triple stores. LUBM was used to produce a synthetic dataset of arbitrary size, that represents people and activities in an academic setting, such as students, professors, classs, departments, and universities.  We did not use the default testing queries with this dataset as they were more designed to measure the performance of OWL inference models.
 
 To service a high performing client-side application the triple store must be able to both return queries quickly and in large volume.  We built a testing framework to benchmark the triple stores, measuring two areas, data loading time and throughput of small queries.
 
@@ -63,6 +63,8 @@ WHERE {
 \smallskip
 
 Query 1 simulates returning the details about an individual where fields are not required to be present.  The \emph{optional} keyword can potentially cause long runtimes so this is a naive approach to this query.  In the query STUDENT is replaced with the URI of a random student pulled from a list of all students.
+
+\clearpage
 
 \begin{lstlisting}[caption=Query 1]
 PREFIX ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#>
@@ -127,10 +129,9 @@ WHERE {
         values ?faculty { <PROFESSOR> }
        }
 \end{lstlisting}
-\clearpage
 
 \section{Results}
-The relational database baseline returned in 5ms for a single row lookup and 6ms for a join.
+The relational database baseline returned on average in 5ms for a single row lookup and 6ms for a join.
 
 \begin{table}
 \begin{center}
@@ -170,7 +171,7 @@ Blazegraph's large number of indexes and well established query optimizer result
 Sesame showed the best performance overall only having problems with the \emph{optional} keyword in the first query.
 
 \section{Conclusion}
-This paper examined the performance of RDf triple stores for query throughput in a real time application and compared it to the performance of a relational database.  We found that performance in two of the stores, Jena and Sesame, were within a few milliseconds as highly optimized relational databases for some queries.  Based on the performance we will move forward with our plans to use an RDF triple store as the primary storage for the real time web application in the CAFE project.
+This paper examined the performance of RDf triple stores for query throughput in a real time application and compared it to the performance of a relational database.  We found that performance in two of the stores, Jena and Sesame, were within a few milliseconds as a highly optimized relational databases for some queries.  Based on the performance we will move forward with our plans to use an RDF triple store as the primary storage for the real time web application in the CAFE project.
 
 \medskip
 \noindent
