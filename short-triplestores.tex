@@ -1,0 +1,42 @@
+\documentclass{llncs}
+\usepackage{llncsdoc}
+\usepackage{listings}
+\lstset{frame=single,language=SQL,morekeywords={PREFIX},basicstyle=\footnotesize\ttfamily}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern} % load a font with all the characters
+\title{Measuring the Usability of Triple Stores for Knowledge Management on Trauma Care Organizations}
+\author{Joseph Utecht \and Mathias Brochhausen PhD}
+\institute{Department of Biomedical Informatics, University of Arkansas for Medical Sciences, Little Rock, AR}
+\date{July 2015}
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+The CAFE project\footnote{\url{http://cafe-trauma.com/}} requires the ability to insert, reason and query data in as close to real time as is possible so the user experience does not suffer. Research has shown that even small delays in a website while attempting to perform some task will greatly decrease the rate at which people complete said task \cite{Galletta2002}.  We see two methods of accomplishing this: A) a relational database to serve the application that is populated through offline reasoning, or B) real time reasoning provided by an RDF triple store that is populated directly from the application. Method A is the more commonly applied however to simplify the architecture of CAFE we would like to use method B, where the triple store is utilized as the primary data storage. While other research has measured the performance of triple stores for reasoning or complex queries, that only covers half of our use case.  We need to know the simple query throughput that modern triple stores can produce so that when designing the CAFE application we will know the upper limit of queries per page. In this paper we measure the performance of various RDF triple stores as they would be used to drive a real time application. We also compare the performance to that of a relational database.
+
+\section{Results}
+The results of the loading test show a large difference between the three storage models of the triple stores.  Blazegraph which has the largest number of indexes takes the longest to insert new data into. Sesame and Jena have similar numbers of indexes, however Sesame is materializing the inferences and thus has slower load times.
+
+The relational database baseline queries were both very fast. These numbers are close to the minimum time a lookup could be performed using the HTTP REST system and therefor are a good measure for results from the RDF triple stores. 
+
+Jena's performance was highly volatile based on the query.  The baseline speed was only a few milliseconds slower than the relational system as expected from the low number of indexes and the lack of inference in the baseline query.  The \emph{optional} keyword in the first query is known to cause potential slowdowns and takes a heavy toll on Jena.  Query 3 also has very poor performance but the reason for this is not clear.  The inference required for query 4 slows it down in comparison to both Blazegraph and Sesame as it must calculate the inference at query time.
+
+Blazegraph's large number of indexes and well established query optimizer result in extremely stable query time.  Blazegraph was the only store that did not take a performance hit from the \emph{optional} keyword in the first query.  There however appears to be a 30ms processing time on anything Blazegraph is doing, of which we were unable to locate the cause.  Because of this 30ms delay, all of Blazegraph's response rates were significantly slower than the relational system.
+
+Sesame showed the best performance overall being only a few milliseconds above the relational system.  Its only problems was with the \emph{optional} keyword in the first query.
+
+\section{Conclusion}
+This paper examined the performance of RDf triple stores for query throughput in a real time application and compared it to the performance of a relational database.  We found that performance in two of the stores, Jena and Sesame, was within a few milliseconds of the optimized relational databases for some queries.  Based on the performance we will move forward with our plans to use an RDF triple store as the primary storage for the real time web application in the CAFE project.
+
+\medskip
+\noindent
+\textbf{Acknowledgement} Research reported in this publication was supported by the National Institute of General Medical Sciences of the National Institutes of Health under award number 1R01GM111324.
+
+\bibliography{mybib}
+\bibliographystyle{ieeetr}
+\end{document}
