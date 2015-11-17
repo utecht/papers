@@ -20,14 +20,14 @@ The CAFE project aims to provide a semantic web technology-based approach to com
 \end{abstract}
 \section{Introduction}
 
-Trauma Centers and trauma systems have been proven to increase positive outcomes in trauma care \cite{pmid16427544, pmid21206286, pmid26151508}. However, comparison of trauma centers and the patient outcome created by them is obstructed by a lack of comparability regarding the organizational components and the terms used to refer to organizational structures and roles. The NIH-funded project \textit{Comparative Assessment For Environments of trauma care} (CAFE) (1R01GM111324-01A1) aims to develop a semantically driven, web-based IT framework to collect data about the organizational structure of trauma centers and systems to allow comparison of different organizational structures. To achieve that CAFE will create a knowledge resource based on an RDF triple store to store data about the organizational structure of both trauma centers and trauma systems. Knowledge about types of entities relevant to the domain will be provided by an ontology coded in Web Ontology Language 2 (OWL2) \footnote{\url{http://www.w3.org/TR/owl2-primer/}}. The Ontology of Trauma Care Organizational Structures is currently under development. This process is guided by domain experts guiding the domain analysis and reviewing the OWL file. Our system will allow users to enter data about the organizational structure of a trauma center or system. This information will be captured from a web application in RDF and the progress in entering data will be perceivable to user by the growing graphical representation of the organizational structure. In the next step the user can request a comparison of their organization with canonical organizations of the same type. The data about those organizations will be stored in the triple store. The system will run a set of queries that retrieve data allowing representations of the same organizational units described by the users data and their interrelations. After the process of evaluation the data entered will be added to the triple store for future usage.
+Trauma Centers and trauma systems have been proven to increase positive outcomes in trauma care \cite{pmid16427544, pmid21206286, pmid26151508}. However, comparison of trauma centers and the patient outcome created by them is obstructed by a lack of comparability regarding the organizational components and the terms used to refer to organizational structures and roles. The NIH-funded project \textit{Comparative Assessment For Environments of trauma care} (CAFE) (1R01GM111324-01A1) aims to develop a semantically driven, web-based IT framework to collect data about the organizational structure of trauma centers and systems to allow comparison of different organizational structures. To achieve that CAFE will create a knowledge resource based on an RDF triple store to store data about the organizational structure of both trauma centers and trauma systems. Knowledge about types of entities relevant to the domain will be provided by an ontology coded in Web Ontology Language 2 (OWL2)\footnote{\url{http://www.w3.org/TR/owl2-primer/}}. The Ontology of Trauma Care Organizational Structures is currently under development. This process is guided by domain experts guiding the domain analysis and reviewing the OWL file. Our system will allow users to enter data about the organizational structure of a trauma center or system. This information will be captured from a web application in RDF and the progress in entering data will be perceivable to user by the growing graphical representation of the organizational structure. In the next step the user can request a comparison of their organization with canonical organizations of the same type. The data about those organizations will be stored in the triple store. The system will run a set of queries that retrieve data allowing representations of the same organizational units described by the users data and their interrelations. After the process of evaluation the data entered will be added to the triple store for future usage.
 
 The CAFE project requires the ability to insert, reason and query data in as close to real time as is possible so the user experience does not suffer. Research has shown that even small delays in a website while attempting to perform some task will greatly decrease the rate at which people complete said task \cite{Galletta2002}.  We see two methods of accomplishing this: A) a relational database to serve the application that is populated through offline reasoning, or B) real time reasoning provided by an RDF triple store that is populated directly from the application. Method A is the more commonly applied however to simplify the architecture of CAFE we would like to use method B, where the triple store is utilized as the primary data storage. While other research has measured the performance of triple stores for reasoning or complex queries, that only covers half of our use case.  We need to know the simple query throughput that modern triple stores can produce so that when designing the CAFE application we will know the upper limit of queries per page. In this paper we measure the performance of various RDF triple stores as they would be used to drive a real time application. We also compare the performance to that of a relational database.
 
 \section{Material and Methods}
 \subsection{RDF Triple Stores}
 
-We have decided to focus on Apache Jena \footnote{\url{https://jena.apache.org/}}, Blazegraph \footnote{\url{http://www.blazegraph.com/bigdata}}, and Sesame \footnote{\url{http://rdf4j.org/}}  RDF stores for our testing due to their support for RDFS reasoning, open source licenses, ability to handle large datasets, and REST endpoints for interaction. \cite{Voigt2012}
+We have decided to focus on Apache Jena\footnote{\url{https://jena.apache.org/}}, Blazegraph\footnote{\url{http://www.blazegraph.com/bigdata}}, and Sesame\footnote{\url{http://rdf4j.org/}}  RDF stores for our testing due to their support for RDFS reasoning, open source licenses, ability to handle large datasets, and REST endpoints for interaction. \cite{Voigt2012}
 
 Testing was performed on a VirtualBox VM \footnote{\url{https://www.virtualbox.org/}} with 2x 2.4 GHz 6-core Xeon processors and 8GB of ram.  The operating system was CentOS 7 \footnote{\url{https://www.centos.org/}} and all of the stores were hosted on the Java application server Tomcat \footnote{\url{http://tomcat.apache.org/}}.
 
@@ -139,7 +139,8 @@ Store & Total & Mean & Stdev & Median \\
 \hline
 Jena & 1776k & 13 & 101 & 5 \\
 Blazegraph & 39341k & 309 & 429 & 12 \\
-Sesame & 8414k & 66 & 205 & 35
+Sesame & 8414k & 66 & 205 & 35 \\
+AllegroGraph & 2199k & 17 & 101 & 5 
 \end{tabular}
 \\[5pt]
 Measured in milliseconds
@@ -173,7 +174,8 @@ The relational database baseline queries were both very fast. These numbers are 
 \hline
 Jena & 8 & 4413 & 29 & 7 & 1678 & 151 \\
 Blazegraph & 38 & 36 & 146 & 37 & 36 & 38 \\
-Sesame & 8 & 253 & 29 & 8 & 8 & 7
+Sesame & 8 & 253 & 29 & 8 & 8 & 7 \\
+AllegroGraph & 7 & 7 & 29 & 7 & 8 & 7
 \end{tabular}
 \\[5pt]
 Measured in milliseconds
