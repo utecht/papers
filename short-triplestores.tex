@@ -46,12 +46,12 @@ A separate average is given excluding a query with the \emph{optional} SPARQL ke
 \begin{tabular}{l | r | r | r | r | r | r}
     Store & Average & Average w/o Optional & Minimum & Maximum \\
 \hline
-Relational & 6 &  & 5 & 6 \\
+Relational & 6 & n/a & 5 & 6 \\
 Jena & 1251 & 461 & 7 & 4413  \\
 Blazegraph & 37 & 37 & 36 & 38 \\
 Sesame & 58 & 8 & 7 & 253  \\
 AllegroGraph & 7 & 7 & 7 & 8 \\
-Stardog & 1000 & 22 & 10 & 1000 \\
+Stardog & n/a & 22 & 10 & 56 \\
 \end{tabular}
 \\[5pt]
 Measured in milliseconds
@@ -64,6 +64,7 @@ The best speeds were within the same range of the relational system as expected 
 The \emph{optional} keyword which is known to cause potential slowdowns takes a heavy toll on Jena resulting in the slowest query of the entire test.
 Blazegraph's large number of indexes and well established query optimizer result in extremely stable query time.
 There however appears to be a 30ms processing time on anything Blazegraph is doing, of which we were unable to locate the cause.
+Stardog performed reasonably well, except that it was unable to return the \emph{optional} query before it timed out after 5 minutes.
 Sesame and AllegroGraph showed great performance overall being within the same range as the relational system on most queries. 
 However Sesame, while not as slow as Jena, also had problems with the \emph{optional} keyword.
 
@@ -73,7 +74,7 @@ Based on this performance we will move forward with our plans to use an RDF trip
 \medskip
 \noindent
 \textbf{Acknowledgement} Research reported in this publication was supported by the National Institute of General Medical Sciences of the National Institutes of Health under award number 1R01GM111324.
-
+\vspace{-1em}
 \bibliography{mybib}
 \bibliographystyle{ieeetr}
 \end{document}
